@@ -21,6 +21,14 @@ async function run() {
   try {
     // Connect the client to the server
     await client.connect();
+
+    const toolsCollection = client.db("sawland-db").collection("tools");
+
+    // Getting all the tools
+    app.get("/tools", async (req, res) => {
+      const tools = await toolsCollection.find({}).toArray();
+      res.send(tools);
+    });
   } finally {
   }
 }
