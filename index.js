@@ -23,11 +23,18 @@ async function run() {
     await client.connect();
 
     const toolsCollection = client.db("sawland-db").collection("tools");
+    const reviewsCollection = client.db("sawland-db").collection("reviews");
 
     // Getting all the tools
     app.get("/tools", async (req, res) => {
       const tools = await toolsCollection.find({}).toArray();
       res.send(tools);
+    });
+
+    // Getting all the reviews
+    app.get("/reviews", async (req, res) => {
+      const reviews = await reviewsCollection.find({}).toArray();
+      res.send(reviews);
     });
   } finally {
   }
