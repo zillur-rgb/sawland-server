@@ -25,6 +25,31 @@ async function run() {
     const toolsCollection = client.db("sawland-db").collection("tools");
     const reviewsCollection = client.db("sawland-db").collection("reviews");
     const orderCollection = client.db("sawland-db").collection("orders");
+    const usersCollection = client.db("sawland-db").collection("users");
+
+    // PUT request to the users
+    app.put("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updatedUser = {
+        $set: user,
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updatedUser,
+        options
+      );
+
+      res.send(result);
+    });
+
+    // get all the users
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find({}).toArray();
+      res.send(result);
+    });
 
     // Post an order
     app.post("/orders", async (req, res) => {
@@ -72,6 +97,12 @@ async function run() {
       res.send(tools);
     });
 
+    // Posting a new review
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.send(result);
+    });
     // Getting all the reviews
     app.get("/reviews", async (req, res) => {
       const reviews = await reviewsCollection.find({}).toArray();
