@@ -32,9 +32,12 @@ async function run() {
       const newOrder = await orderCollection.insertOne(orderBody);
       res.send(newOrder);
     });
+
     // getting all order
     app.get("/orders", async (req, res) => {
-      const allOrders = await orderCollection.find({}).toArray();
+      const email = req.query.email;
+      const query = { email: email };
+      const allOrders = await orderCollection.find(query).toArray();
       res.send(allOrders);
     });
 
