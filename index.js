@@ -1,4 +1,5 @@
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const app = express();
@@ -27,6 +28,30 @@ async function run() {
     const orderCollection = client.db("sawland-db").collection("orders");
     const usersCollection = client.db("sawland-db").collection("users");
 
+    // Verify JWT
+    const verifyJWT = (req, res, next) => {
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        res.status(401).send({
+          message: "Unauthorized access",
+        });
+      }
+
+      const token = authHeader.split(" ")[1];
+      jwt.verify(
+        token,
+        process.env.ACCESS_TOKEN_SECRET,
+        function (err, decoded) {
+          if (err) {
+            return res.status(403).send({
+              message: "Forbidden access",
+            });
+          }
+          req.decoded = decoded;
+          next();
+        }
+      );
+    };
     // PUT request to the users
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
@@ -42,7 +67,15 @@ async function run() {
         options
       );
 
-      res.send(result);
+      const token = jwt.sign(
+        { email: email },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+
+      res.send({ result, token });
     });
 
     // get all the users
@@ -59,11 +92,18 @@ async function run() {
     });
 
     // getting all order
-    app.get("/orders", async (req, res) => {
+    app.get("/orders", verifyJWT, async (req, res) => {
       const email = req.query.email;
-      const query = { email: email };
-      const allOrders = await orderCollection.find(query).toArray();
-      res.send(allOrders);
+      const decodedEmail = req.decoded.email;
+      if (email === decodedEmail) {
+        const query = { email: email };
+        const allOrders = await orderCollection.find(query).toArray();
+        res.send(allOrders);
+      } else {
+        res.status(403).send({
+          message: "Access Forbidden",
+        });
+      }
     });
 
     // Deleting an order
