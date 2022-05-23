@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -24,7 +24,37 @@ async function run() {
 
     const toolsCollection = client.db("sawland-db").collection("tools");
     const reviewsCollection = client.db("sawland-db").collection("reviews");
+    const orderCollection = client.db("sawland-db").collection("orders");
 
+    // Post an order
+    app.post("/orders", async (req, res) => {
+      const orderBody = req.body;
+      const newOrder = await orderCollection.insertOne(orderBody);
+      res.send(newOrder);
+    });
+    // getting all order
+    app.get("/orders", async (req, res) => {
+      const allOrders = await orderCollection.find({}).toArray();
+      res.send(allOrders);
+    });
+
+    // PUT request in the tools to reduce stock and increase sold
+    app.put("/tools/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedBody = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedTool = {
+        $set: { stock: updatedBody.stock, sold: updatedBody.sold },
+      };
+      const result = await toolsCollection.updateOne(
+        filter,
+        updatedTool,
+        options
+      );
+
+      res.send(result);
+    });
     // Getting all the tools
     app.get("/tools", async (req, res) => {
       const tools = await toolsCollection.find({}).toArray();
