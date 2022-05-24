@@ -54,13 +54,13 @@ async function run() {
     };
 
     // Get all the admin
-    app.get("/users/admin", async (req, res) => {
+    app.get("/users/admin", verifyJWT, async (req, res) => {
       const result = await usersCollection.find({ role: "admin" }).toArray();
       res.send(result);
     });
 
     // Find out if admin
-    app.get("/users/admin/:email", async (req, res) => {
+    app.get("/users/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
       const user = await usersCollection.findOne({ email: email });
       const isAdmin = user.role === "admin";
@@ -88,6 +88,14 @@ async function run() {
           message: "Forbidden",
         });
       }
+    });
+
+    // get single users
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
     });
 
     // PUT request to the users
@@ -130,8 +138,26 @@ async function run() {
     });
 
     // getting all order
-    app.get("/orders", verifyJWT, async (req, res) => {
-      const email = req.query.email;
+    // app.get("/orders/:email", verifyJWT, async (req, res) => {
+    //   const email = req.params.email;
+    //   const requester = req.decoded.email;
+    //   const requesterInfo = await usersCollection.findOne({
+    //     email: requester,
+    //   });
+    //   if (requesterInfo.role === "admin" || requester === email) {
+    //     const result = await orderCollection.find({}).toArray();
+    //     res.send(result);
+    //   }
+    // });
+
+    app.get("/orders", async (req, res) => {
+      const result = await orderCollection.find({}).toArray();
+      res.send(result);
+    });
+
+    // Fetting specific order for user
+    app.get("/orders/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
       const decodedEmail = req.decoded.email;
       if (email === decodedEmail) {
         const query = { email: email };
@@ -167,6 +193,12 @@ async function run() {
         options
       );
 
+      res.send(result);
+    });
+    app.get("/tools/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await toolsCollection.findOne(query);
       res.send(result);
     });
     // Getting all the tools
