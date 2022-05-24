@@ -53,17 +53,33 @@ async function run() {
       );
     };
 
-    // PUT request to make admin
-    app.put("/users/admin/:email", async (req, res) => {
-      const email = req.params.email;
-      const filter = { email: email };
-      const updatedDoc = {
-        $set: {
-          role: "admin",
-        },
-      };
-      const result = await usersCollection.updateOne(filter, updatedDoc);
+    // Get all the admin
+    app.get("/users/admin", async (req, res) => {
+      const result = await usersCollection.find({ role: "admin" }).toArray();
       res.send(result);
+    });
+
+    // PUT request to make admin
+    app.put("/users/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const requester = req.decoded.email;
+      const requesterInfo = await usersCollection.findOne({
+        email: requester,
+      });
+      if (requesterInfo.role === "admin") {
+        const filter = { email: email };
+        const updatedDoc = {
+          $set: {
+            role: "admin",
+          },
+        };
+        const result = await usersCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+      } else {
+        res.status(403).send({
+          message: "Forbidden",
+        });
+      }
     });
 
     // PUT request to the users
