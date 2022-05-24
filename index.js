@@ -52,6 +52,20 @@ async function run() {
         }
       );
     };
+
+    // PUT request to make admin
+    app.put("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const updatedDoc = {
+        $set: {
+          role: "admin",
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+
     // PUT request to the users
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
