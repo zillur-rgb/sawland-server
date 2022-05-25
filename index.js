@@ -27,6 +27,7 @@ async function run() {
     const reviewsCollection = client.db("sawland-db").collection("reviews");
     const orderCollection = client.db("sawland-db").collection("orders");
     const usersCollection = client.db("sawland-db").collection("users");
+    const blogsCollection = client.db("sawland-db").collection("blogs");
 
     // Verify JWT
     const verifyJWT = (req, res, next) => {
@@ -52,6 +53,19 @@ async function run() {
         }
       );
     };
+
+    // Post a blog
+    app.post("/blogs", verifyJWT, async (req, res) => {
+      const body = req.body;
+      const result = await blogsCollection.insertOne(body);
+      res.send(result);
+    });
+
+    // get all blogs
+    app.get("/blogs", verifyJWT, async (req, res) => {
+      const allBlogs = await blogsCollection.find({}).toArray();
+      res.send(allBlogs);
+    });
 
     // Get all the admin
     app.get("/users/admin", verifyJWT, async (req, res) => {
@@ -205,6 +219,13 @@ async function run() {
     app.get("/tools", async (req, res) => {
       const tools = await toolsCollection.find({}).toArray();
       res.send(tools);
+    });
+
+    // Psoting a new tool
+    app.post("/tools", verifyJWT, async (req, res) => {
+      const tool = req.body;
+      const result = await toolsCollection.insertOne(tool);
+      res.send(result);
     });
 
     // Posting a new review
