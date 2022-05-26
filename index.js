@@ -55,6 +55,18 @@ async function run() {
       );
     };
 
+    // app.post("/create-payment-intent", async (req, res) => {
+    //   const order = req.body;
+    //   const price = order.price;
+    //   const amount = price * 100;
+    //   const paymentIntent = await stripe.paymentIntents.create({
+    //     amount: amount,
+    //     currency: "eur",
+    //     payment_method_types: ["card"],
+    //   });
+    //   res.send({ clientSecret: paymentIntent.client_secret });
+    // });
+
     // Post a blog
     app.post("/blogs", verifyJWT, async (req, res) => {
       const body = req.body;
@@ -160,13 +172,13 @@ async function run() {
       res.send(newOrder);
     });
 
-    // // Getting single order info
-    // app.get("/orders/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: ObjectId(id) };
-    //   const result = await orderCollection.findOne(query);
-    //   res.send(result);
-    // });
+    // Getting single order info
+    app.get("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.findOne(query);
+      res.send(result);
+    });
 
     app.get("/orders", async (req, res) => {
       const result = await orderCollection.find({}).toArray();
