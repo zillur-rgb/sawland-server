@@ -4,6 +4,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
@@ -62,7 +63,7 @@ async function run() {
     });
 
     // get all blogs
-    app.get("/blogs", verifyJWT, async (req, res) => {
+    app.get("/blogs", async (req, res) => {
       const allBlogs = await blogsCollection.find({}).toArray();
       res.send(allBlogs);
     });
@@ -112,6 +113,14 @@ async function run() {
       res.send(result);
     });
 
+    // delete single user
+    app.delete("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // PUT request to the users
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
@@ -151,17 +160,12 @@ async function run() {
       res.send(newOrder);
     });
 
-    // getting all order
-    // app.get("/orders/:email", verifyJWT, async (req, res) => {
-    //   const email = req.params.email;
-    //   const requester = req.decoded.email;
-    //   const requesterInfo = await usersCollection.findOne({
-    //     email: requester,
-    //   });
-    //   if (requesterInfo.role === "admin" || requester === email) {
-    //     const result = await orderCollection.find({}).toArray();
-    //     res.send(result);
-    //   }
+    // // Getting single order info
+    // app.get("/orders/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: ObjectId(id) };
+    //   const result = await orderCollection.findOne(query);
+    //   res.send(result);
     // });
 
     app.get("/orders", async (req, res) => {
