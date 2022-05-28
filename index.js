@@ -29,6 +29,7 @@ async function run() {
     const orderCollection = client.db("sawland-db").collection("orders");
     const usersCollection = client.db("sawland-db").collection("users");
     const blogsCollection = client.db("sawland-db").collection("blogs");
+    const paymentsCollection = client.db("sawland-db").collection("payments");
 
     // Verify JWT
     const verifyJWT = (req, res, next) => {
@@ -181,6 +182,24 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+
+    app.patch("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const payment = req.body;
+      const filter = {
+        _id: ObjectId(id),
+      };
+      const updatedDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId,
+        },
+      };
+
+      const result = await paymentsCollection.insertOne(payment);
+      const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
+      res.send(updatedDoc);
     });
 
     app.get("/orders", async (req, res) => {
