@@ -9,7 +9,7 @@ const PORT: number | string = process.env.PORT || 5000;
 async function bootstrap() {
   try {
     await mongoose.connect(
-      `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.hordi.mongodb.net/?retryWrites=true&w=majority`
+      `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.hordi.mongodb.net/sawland-db?retryWrites=true&w=majority`
     );
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
