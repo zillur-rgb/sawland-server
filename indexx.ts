@@ -7,7 +7,7 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const PORT = process.env.PORT || 5000;
+// const PORT = process.env.PORT || 5000;
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.hordi.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -286,4 +286,4 @@ app.get("/", async (req, res) => {
   res.send("<h1>Hello from Sawland</h1>");
 });
 
-app.listen(PORT, console.log(`App running on port ${PORT}`));
+// app.listen(PORT, console.log(`App running on port ${PORT}`));
