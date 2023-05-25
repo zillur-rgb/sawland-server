@@ -4,6 +4,7 @@ import toolsRoute from "./module/tools/tools.route";
 import reviewsRoute from "./module/reviews/reviews.route";
 import ordersRoute from "./module/orders/orders.route";
 import usersRoute from "./module/users/users.route";
+import paymentsRoute from "./module/payments/payments.route";
 import cors from "cors";
 
 const app: Application = express();
@@ -18,4 +19,5 @@ app.use("/api/v1/tools", toolsRoute);
 app.use("/api/v1/reviews", reviewsRoute);
 app.use("/api/v1/orders", ordersRoute);
 app.use("/api/v1/users", usersRoute);
+app.use("/api/v1/payments", paymentsRoute);
 export default app;
