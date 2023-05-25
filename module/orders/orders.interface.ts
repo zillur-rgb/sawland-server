@@ -7,6 +7,6 @@ export interface IOrder {
   country?: string;
   total: number;
   toolName: string;
-  paid: boolean;
+  paid?: boolean;
   transactionId?: string;
 }
