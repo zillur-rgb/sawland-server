@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { IBlog } from "./student.interface";
+import { IBlog } from "./blog.interface";
 
 export const blogSchema = new Schema<IBlog>({
   title: {

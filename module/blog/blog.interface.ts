@@ -1,4 +1,4 @@
-interface IBlog {
+export interface IBlog {
   title: string;
   desc: string;
   img?: string;
